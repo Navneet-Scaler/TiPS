@@ -208,6 +208,66 @@ PLATFORMS = [
          tier="tier1", domain="Climate / Earth Observation", summary="Post-disaster flood damage assessment from drone imagery, recurring challenge."),
     dict(title="Open Cities AI Challenge", organization="DrivenData", url="https://www.drivendata.org/competitions/60/building-segmentation-disaster-resilience/",
          tier="tier1", domain="Climate / Earth Observation", summary="Building segmentation challenge for disaster-resilience planning."),
+    dict(title="RSNA AI Challenges", organization="Radiological Society of North America", url="https://www.rsna.org/",
+         tier="tier1", domain="Healthcare / Medical AI", summary="Annual medical imaging AI challenge run alongside the RSNA conference."),
+    dict(title="ISIC Skin Imaging Challenge", organization="ISIC Archive", url="https://www.isic-archive.com/",
+         tier="tier1", domain="Healthcare / Medical AI", summary="Skin lesion image analysis challenge, recurring MICCAI-affiliated benchmark."),
+    dict(title="Climate Change AI Programs", organization="Climate Change AI", url="https://www.climatechange.ai/",
+         tier="tier1", domain="Climate / Earth Observation", summary="Community running workshops, summer schools, and challenge programs at the ML/climate intersection."),
+
+    # ---- Tier 1: Security / CTF competitions (bug bounty + capture-the-flag) ----
+    dict(title="HackerOne Programs", organization="HackerOne", url="https://hackerone.com/directory/programs",
+         tier="tier1", domain="AI Safety", summary="Directory of live bug bounty programs, including AI/LLM red-teaming programs."),
+    dict(title="Bugcrowd Programs", organization="Bugcrowd", url="https://bugcrowd.com/programs",
+         tier="tier1", domain="AI Safety", summary="Crowdsourced security bug bounty platform, growing AI/LLM red-team category."),
+    dict(title="Synack Red Team", organization="Synack", url="https://www.synack.com/",
+         tier="tier1", domain="AI Safety", summary="Vetted red-team security testing platform, increasingly covers AI systems."),
+    dict(title="Hack The Box", organization="Hack The Box", url="https://www.hackthebox.com/",
+         tier="tier1", domain="AI Safety", summary="Cybersecurity CTF and skills platform with recurring competitive seasons."),
+    dict(title="TryHackMe", organization="TryHackMe", url="https://tryhackme.com/",
+         tier="tier1", domain="AI Safety", summary="Gamified cybersecurity learning platform with recurring CTF competitions."),
+    dict(title="picoCTF", organization="Carnegie Mellon University", url="https://picoctf.org/",
+         tier="tier1", domain="AI Safety", summary="CMU's free annual CTF competition, popular with students."),
+    dict(title="DEF CON AI Village CTF", organization="AI Village", url="https://aivillage.org/",
+         tier="tier1", domain="AI Safety", summary="DEF CON's AI-focused village, runs AI red-teaming CTF challenges annually."),
+
+    # ---- Tier 1: More data science competition platforms ----
+    dict(title="Analytics Vidhya DataHack", organization="Analytics Vidhya", url="https://datahack.analyticsvidhya.com/",
+         tier="tier1", domain="Data Science", summary="India-based data science hackathon and competition platform."),
+    dict(title="MachineHack", organization="MachineHack", url="https://machinehack.com/",
+         tier="tier1", domain="Data Science", summary="ML competition platform focused on practical business use cases."),
+    dict(title="Bitgrit Competitions", organization="Bitgrit", url="https://bitgrit.net/competition/",
+         tier="tier1", domain="Data Science", summary="Data science competition platform with a global participant base."),
+    dict(title="KDD Cup", organization="ACM SIGKDD", url="https://kdd.org/kdd-cup",
+         tier="tier1", domain="Data Science", summary="Premier annual data mining competition run alongside the KDD conference."),
+    dict(title="IEEE DataPort Challenges", organization="IEEE", url="https://ieee-dataport.org/",
+         tier="tier1", domain="Data Science", summary="IEEE's open data platform, hosts recurring dataset-driven AI challenges."),
+    dict(title="Numerai Tournament (homepage)", organization="Numerai", url="https://numer.ai/",
+         tier="tier1", domain="Finance / Quant", summary="Numerai's homepage - the live tournament itself is tracked separately with real round data."),
+
+    # ---- Tier 1: More computer vision / speech benchmarks ----
+    dict(title="VQA Challenge", organization="Georgia Tech / VirginiaTech", url="https://visualqa.org/challenge.html",
+         tier="tier1", domain="Multimodal / Generative", summary="Visual Question Answering challenge, a foundational multimodal AI benchmark."),
+    dict(title="Argoverse Challenges", organization="Argo AI / Woven Planet", url="https://www.argoverse.org/",
+         tier="tier1", domain="Autonomous Driving", summary="Motion forecasting and 3D tracking challenges for autonomous driving."),
+    dict(title="VoxCeleb Speaker Recognition Challenge", organization="VoxCeleb", url="https://mm.kaist.ac.kr/datasets/voxceleb/",
+         tier="tier1", domain="Speech", summary="Recurring speaker recognition and diarization challenge series."),
+    dict(title="ICASSP Challenges", organization="IEEE ICASSP", url="https://2026.ieeeicassp.org/",
+         tier="tier1", domain="Speech", summary="IEEE's signal processing conference, hosts recurring speech/audio challenges."),
+
+    # ---- Tier 1: More robotics/RL environments (GitHub-hosted) ----
+    dict(title="MineDojo", organization="NVIDIA / Caltech", url="https://minedojo.org/",
+         tier="tier1", domain="Reinforcement Learning", summary="Open-ended embodied agent benchmark built on Minecraft."),
+    dict(title="Unity ML-Agents", organization="Unity Technologies", url="https://github.com/Unity-Technologies/ml-agents",
+         tier="tier1", domain="Reinforcement Learning", summary="RL training toolkit and environment suite used in several agent competitions."),
+
+    # ---- Tier 1: GitHub-hosted LLM/agent benchmarks ----
+    dict(title="HumanEval Benchmark", organization="OpenAI", url="https://github.com/openai/human-eval",
+         tier="tier1", domain="Agents", summary="Code-generation correctness benchmark, the standard for coding-agent evals."),
+    dict(title="MMLU Benchmark", organization="UC Berkeley / Hendrycks et al.", url="https://github.com/hendrycks/test",
+         tier="tier1", domain="NLP", summary="Massive Multitask Language Understanding benchmark, a standard LLM eval suite."),
+    dict(title="GAIA Benchmark", organization="Meta AI / Hugging Face", url="https://huggingface.co/gaia-benchmark",
+         tier="tier1", domain="Agents", summary="General AI Assistants benchmark for real-world agentic task completion."),
 
     # ---- Tier 1: Company-run official AI competition/program pages ----
     dict(title="Google AI Competitions", organization="Google AI", url="https://ai.google/",
@@ -242,6 +302,36 @@ PLATFORMS = [
          tier="tier1", domain="Multimodal / Generative", summary="Adobe's research division, strong generative media and creative AI focus."),
     dict(title="Intel AI Developer Program", organization="Intel", url="https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/overview.html",
          tier="tier1", domain="General ML", summary="Intel's AI developer program, periodic edge-AI hackathons and challenges."),
+]
+
+GOVERNMENT_AND_BUILDER_PLATFORMS = [
+    # ---- Tier 3: Government / national hackathons ----
+    dict(title="NASA Space Apps Challenge", organization="NASA", url="https://www.spaceappschallenge.org/",
+         tier="tier3", domain="Data Science", summary="NASA's global annual hackathon using open space and earth science data."),
+    dict(title="ISRO Open Challenges", organization="Indian Space Research Organisation", url="https://www.isro.gov.in/",
+         tier="tier3", domain="Data Science", summary="India's space agency, periodically runs open data and innovation challenges."),
+    dict(title="Smart India Hackathon", organization="Government of India", url="https://sih.gov.in/",
+         tier="tier3", domain="General ML", summary="India's flagship national-level student hackathon across government ministries."),
+    dict(title="DRDO Open Challenges", organization="Defence Research and Development Organisation", url="https://www.drdo.gov.in/",
+         tier="tier3", domain="Robotics", summary="India's defense R&D body, runs open innovation and robotics challenges."),
+    dict(title="Startup Weekend", organization="Techstars", url="https://startupweekend.org/",
+         tier="tier3", domain="General ML", summary="54-hour global startup-building weekend event series, frequent AI tracks."),
+    dict(title="Microsoft Imagine Cup", organization="Microsoft", url="https://imaginecup.microsoft.com/",
+         tier="tier3", domain="General ML", summary="Microsoft's global student technology competition, strong AI track focus."),
+    dict(title="Google Solution Challenge", organization="Google Developer Student Clubs", url="https://developers.google.com/community/gdsc-solution-challenge",
+         tier="tier3", domain="General ML", summary="Google's annual student hackathon solving for the UN Sustainable Development Goals."),
+
+    # ---- Tier 3: Web3 / builder grant ecosystems ----
+    dict(title="Gitcoin Grants", organization="Gitcoin", url="https://www.gitcoin.co/",
+         tier="tier3", domain="Agents", summary="Quadratic-funding grants platform for open-source and public-goods builders."),
+    dict(title="Questbook", organization="Questbook", url="https://questbook.app/",
+         tier="tier3", domain="Agents", summary="Web3 grants discovery and application platform."),
+    dict(title="Superteam", organization="Superteam", url="https://superteam.fun/",
+         tier="tier3", domain="Agents", summary="Solana ecosystem talent and bounty network, frequent builder challenges."),
+    dict(title="Encode Club", organization="Encode Club", url="https://www.encode.club/",
+         tier="tier3", domain="Agents", summary="Web3 hackathon and education community, runs recurring cohort hackathons."),
+    dict(title="Open Source Collective", organization="Open Source Collective", url="https://oscollective.org/",
+         tier="tier3", domain="General ML", summary="Fiscal host and funding platform for open-source projects and maintainers."),
 ]
 
 ELITE_ORGS = [
@@ -329,7 +419,7 @@ def run(db: Session) -> dict:
     source = ensure_source(db)
     now = datetime.utcnow()
     added_count = 0
-    all_entries = PLATFORMS + ELITE_ORGS
+    all_entries = PLATFORMS + ELITE_ORGS + GOVERNMENT_AND_BUILDER_PLATFORMS
 
     unchecked = [e for e in all_entries if not db.query(Opportunity).filter(Opportunity.url == e["url"]).first()]
     dead_urls = filter_dead_urls([e["url"] for e in unchecked])

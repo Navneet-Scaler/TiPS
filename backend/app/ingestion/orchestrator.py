@@ -17,6 +17,8 @@ from . import (
     unstop,
     zindi,
     competitions_registry,
+    huggingface_spaces,
+    numerai,
 )
 
 logger = logging.getLogger("tips.ingestion.orchestrator")
@@ -30,6 +32,8 @@ CONNECTORS = {
     "devpost": devpost.run,
     "unstop": unstop.run,
     "zindi": zindi.run,
+    "huggingface_spaces": huggingface_spaces.run,
+    "numerai": numerai.run,
     "research_registry": research_registry.run,
     "startup_registry": startup_registry.run,
     "competitions_registry": competitions_registry.run,

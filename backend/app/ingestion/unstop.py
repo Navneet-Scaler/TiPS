@@ -9,6 +9,7 @@ from datetime import datetime
 import httpx
 from sqlalchemy.orm import Session
 
+from ..classify import classify_ai_domain
 from ..models import Opportunity, Source
 from .sources import UNSTOP_SEARCH_TERMS
 from .utils import safe_add
@@ -82,13 +83,17 @@ def run(db: Session) -> dict:
                 organization = (item.get("organisation") or {}).get("name", "Unstop")
                 region = item.get("region", "")
                 is_remote = region.lower() in ("online", "remote", "")
+                title = item.get("title", "Untitled hackathon")
+                summary = _strip_html(item.get("details", ""))[:500] or None
 
                 added = safe_add(db, Opportunity(
-                    title=item.get("title", "Untitled hackathon"),
-                    summary=_strip_html(item.get("details", ""))[:500] or None,
+                    title=title,
+                    summary=summary,
                     url=url,
                     category="Competitions",
                     subcategory="Hackathon",
+                    tier="tier1",
+                    domain=classify_ai_domain(title, summary or ""),
                     organization=organization,
                     geography="India" if not is_remote else "Global",
                     is_remote=is_remote,

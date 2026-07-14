@@ -44,6 +44,8 @@ class Opportunity(Base):
     deadline = Column(DateTime, nullable=True)
     is_rolling = Column(Boolean, default=False)  # explicit "no fixed deadline" vs unknown
     dilution_type = Column(String, nullable=True)  # equity / non-dilutive / unknown
+    tier = Column(String, nullable=True, index=True)  # tier1 / tier2 / tier3 (Competitions tab)
+    domain = Column(String, nullable=True)  # AI/ML sub-field: Agents, NLP, Computer Vision, ...
 
     published_at = Column(DateTime, nullable=True, index=True)
     discovered_at = Column(DateTime, default=datetime.utcnow, index=True)

@@ -84,6 +84,7 @@ def run(db: Session) -> dict:
                     url=url,
                     category=category,
                     subcategory=subcategory,
+                    tier="tier2" if category == "Competitions" else None,
                     organization=f"r/{subreddit}",
                     geography="Global",
                     is_paid=is_funded(title, summary),

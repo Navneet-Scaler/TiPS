@@ -28,4 +28,8 @@ def run_light_migrations():
             conn.exec_driver_sql("ALTER TABLE opportunities ADD COLUMN is_rolling BOOLEAN DEFAULT 0")
         if "dilution_type" not in existing_cols:
             conn.exec_driver_sql("ALTER TABLE opportunities ADD COLUMN dilution_type VARCHAR")
+        if "tier" not in existing_cols:
+            conn.exec_driver_sql("ALTER TABLE opportunities ADD COLUMN tier VARCHAR")
+        if "domain" not in existing_cols:
+            conn.exec_driver_sql("ALTER TABLE opportunities ADD COLUMN domain VARCHAR")
         conn.commit()

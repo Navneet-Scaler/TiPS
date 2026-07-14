@@ -20,6 +20,8 @@ class OpportunityOut(BaseModel):
     deadline: Optional[datetime] = None
     is_rolling: bool = False
     dilution_type: Optional[str] = None
+    tier: Optional[str] = None
+    domain: Optional[str] = None
     published_at: Optional[datetime] = None
     discovered_at: datetime
     score: float

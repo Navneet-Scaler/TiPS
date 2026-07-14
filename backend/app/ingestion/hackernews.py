@@ -64,6 +64,7 @@ def run(db: Session) -> dict:
                     url=url,
                     category=category,
                     subcategory=classify_competition_subcategory(title, "") if category == "Competitions" else None,
+                    tier="tier2" if category == "Competitions" else None,
                     organization="Hacker News",
                     geography="Global",
                     published_at=published_at,

@@ -119,6 +119,29 @@ def classify_competition_subcategory(title: str, summary: str) -> Optional[str]:
     return None
 
 
+# Coarse AI/ML sub-field tagging - checked in order, first match wins.
+# This is a "nice to have" tag on top of category/subcategory, not a gate.
+AI_DOMAIN_KEYWORDS = [
+    ("Agents", ["agent", "agentic", "autonomous agent", "multi-agent", "tool use", "mcp"]),
+    ("NLP", ["nlp", "language model", "llm", "text generation", "translation", "chatbot"]),
+    ("Computer Vision", ["computer vision", "image recognition", "object detection", "segmentation", "vision"]),
+    ("Speech", ["speech recognition", "asr", "text-to-speech", "voice ai", "audio"]),
+    ("Robotics", ["robotics", "robot", "manipulation", "autonomous driving", "self-driving"]),
+    ("Reinforcement Learning", ["reinforcement learning", "rl agent", "policy learning"]),
+    ("Multimodal / Generative", ["generative ai", "diffusion", "text-to-image", "multimodal", "genai"]),
+    ("Data Science", ["data science", "kaggle", "datathon", "predictive modeling"]),
+    ("AI Safety", ["ai safety", "alignment", "interpretability", "red team"]),
+]
+
+
+def classify_ai_domain(title: str, summary: str) -> Optional[str]:
+    text = f"{title} {summary or ''}".lower()
+    for domain, keywords in AI_DOMAIN_KEYWORDS:
+        if _any_keyword(text, keywords):
+            return domain
+    return None
+
+
 # Categories that require a real opportunity-shaped signal before an item is
 # allowed to stay in them - without this, a paper abstract that happens to
 # contain "research" or "challenges" gets bucketed as an actual opportunity.

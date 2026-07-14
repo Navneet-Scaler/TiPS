@@ -134,7 +134,7 @@ export default function ResearchView({ query }: { query: string }) {
               Seeking Collaborators &middot; time-sensitive
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {collaborators.map((o) => (
               <OpportunityCard key={o.id} opportunity={o} />
             ))}
@@ -145,7 +145,7 @@ export default function ResearchView({ query }: { query: string }) {
       <div className="text-[11px] uppercase tracking-wider text-base-muted mb-3">
         {loading ? "Loading" : `${activeSubcategory ? items.length : rest.length} opportunities`}
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {(activeSubcategory ? items : rest).map((o) => (
           <OpportunityCard key={o.id} opportunity={o} />
         ))}

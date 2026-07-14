@@ -9,6 +9,7 @@ import Timeline from "@/components/Timeline";
 import CategoryBars from "@/components/CategoryBars";
 import ResearchView from "@/components/ResearchView";
 import StartupView from "@/components/StartupView";
+import CompetitionsView from "@/components/CompetitionsView";
 import { ALL_NAV_ITEMS } from "@/lib/categories";
 import { fetchOpportunities, fetchStats, fetchTimeline, Opportunity, Stats } from "@/lib/api";
 
@@ -28,9 +29,10 @@ export default function Page() {
 
   const isResearch = active === "research";
   const isStartup = active === "startup";
+  const isCompetitions = active === "competitions";
 
   useEffect(() => {
-    if (isResearch || isStartup) {
+    if (isResearch || isStartup || isCompetitions) {
       setLoading(false);
       return;
     }
@@ -58,7 +60,7 @@ export default function Page() {
     return () => {
       cancelled = true;
     };
-  }, [active, query, activeItem, isResearch, isStartup]);
+  }, [active, query, activeItem, isResearch, isStartup, isCompetitions]);
 
   const loadMore = () => {
     const sort = active === "trending" ? "trending" : "recent";
@@ -86,10 +88,10 @@ export default function Page() {
   const showHome = active === "home";
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <Sidebar active={active} onSelect={setActive} />
 
-      <main className="flex-1 px-8 py-6 max-w-6xl">
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-6xl w-full min-w-0">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-lg font-semibold">{activeItem?.label ?? "Home"}</h1>
@@ -113,7 +115,7 @@ export default function Page() {
         )}
 
         {showHome && stats && (
-          <div className="grid grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div className="bg-base-panel border border-base-border rounded-xl p-4">
               <div className="text-[11px] uppercase tracking-wider text-base-muted mb-3">By Category</div>
               <CategoryBars data={stats.by_category} />
@@ -135,6 +137,8 @@ export default function Page() {
           <ResearchView query={query} />
         ) : isStartup ? (
           <StartupView query={query} />
+        ) : isCompetitions ? (
+          <CompetitionsView query={query} />
         ) : (
           <div>
             <div className="text-[11px] uppercase tracking-wider text-base-muted mb-3">
@@ -142,7 +146,7 @@ export default function Page() {
                 ? "Loading"
                 : `${filtered.length} loaded${stats?.by_category && activeItem?.category ? ` of ${stats.by_category[activeItem.category] ?? filtered.length}` : ""}`}
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filtered.map((o) => (
                 <OpportunityCard key={o.id} opportunity={o} />
               ))}

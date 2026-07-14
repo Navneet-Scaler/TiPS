@@ -54,6 +54,8 @@ REDDIT_SUBREDDITS = [
     "opensource",
     "PhD",
     "gradadmissions",
+    "hackathon",
+    "developersIndia",
 ]
 
 HN_KEYWORDS = ["AI hackathon", "AI fellowship", "AI residency", "AI research grant"]
@@ -63,8 +65,14 @@ GITHUB_TOPICS = ["ai-agents", "llm", "machine-learning", "generative-ai"]
 # Search terms run against Devpost's and Unstop's public search APIs each
 # cycle - both return live, open, deadline-bearing hackathons directly, no
 # scraping needed.
-DEVPOST_SEARCH_TERMS = ["artificial intelligence", "machine learning", "LLM", "generative AI", "AI agents"]
-UNSTOP_SEARCH_TERMS = ["artificial intelligence", "machine learning", "AI hackathon", "data science"]
+DEVPOST_SEARCH_TERMS = [
+    "artificial intelligence", "machine learning", "LLM", "generative AI", "AI agents",
+    "computer vision", "robotics", "NLP",
+]
+UNSTOP_SEARCH_TERMS = [
+    "artificial intelligence", "machine learning", "AI hackathon", "data science",
+    "robotics", "computer vision",
+]
 
 # Greenhouse job-board tokens (the string in boards-api.greenhouse.io/v1/boards/<token>/jobs)
 GREENHOUSE_BOARDS = [

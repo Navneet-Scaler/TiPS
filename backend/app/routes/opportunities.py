@@ -23,6 +23,8 @@ def list_opportunities(
     is_paid: Optional[bool] = None,
     dilution_type: Optional[str] = None,
     is_rolling: Optional[bool] = None,
+    tier: Optional[str] = None,
+    domain: Optional[str] = None,
     include_expired: bool = False,
     sort: str = Query("recent", pattern="^(recent|trending)$"),
     limit: int = 60,
@@ -48,6 +50,10 @@ def list_opportunities(
         query = query.filter(Opportunity.dilution_type == dilution_type)
     if is_rolling is not None:
         query = query.filter(Opportunity.is_rolling == is_rolling)
+    if tier:
+        query = query.filter(Opportunity.tier == tier)
+    if domain:
+        query = query.filter(Opportunity.domain == domain)
     if q:
         like = f"%{q}%"
         query = query.filter((Opportunity.title.ilike(like)) | (Opportunity.summary.ilike(like)) | (Opportunity.organization.ilike(like)))
@@ -94,6 +100,34 @@ def startup_subtypes(db: Session = Depends(get_db)):
         .all()
     )
     return {(sub or "General"): count for sub, count in rows}
+
+
+@router.get("/competitions/tiers")
+def competitions_tiers(db: Session = Depends(get_db)):
+    now = datetime.utcnow()
+    rows = (
+        db.query(Opportunity.tier, func.count(Opportunity.id))
+        .filter(
+            Opportunity.category == "Competitions",
+            or_(Opportunity.deadline.is_(None), Opportunity.deadline >= now),
+        )
+        .group_by(Opportunity.tier)
+        .all()
+    )
+    return {(t or "tier2"): count for t, count in rows}
+
+
+@router.get("/competitions/domains")
+def competitions_domains(db: Session = Depends(get_db), tier: Optional[str] = None):
+    now = datetime.utcnow()
+    query = db.query(Opportunity.domain, func.count(Opportunity.id)).filter(
+        Opportunity.category == "Competitions",
+        or_(Opportunity.deadline.is_(None), Opportunity.deadline >= now),
+    )
+    if tier:
+        query = query.filter(Opportunity.tier == tier)
+    rows = query.group_by(Opportunity.domain).order_by(func.count(Opportunity.id).desc()).all()
+    return {(d or "General"): count for d, count in rows}
 
 
 @router.get("/stats", response_model=StatsOut)

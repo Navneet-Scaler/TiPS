@@ -12,7 +12,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from ..models import Opportunity, Source
-from .utils import safe_add, url_is_dead
+from .utils import filter_dead_urls, safe_add
 
 logger = logging.getLogger("tips.ingestion.research_registry")
 
@@ -159,10 +159,11 @@ def run(db: Session) -> dict:
     now = datetime.utcnow()
     new_count = 0
 
-    for program in PROGRAMS:
-        if db.query(Opportunity).filter(Opportunity.url == program["url"]).first():
-            continue
-        if url_is_dead(program["url"]):
+    unchecked = [p for p in PROGRAMS if not db.query(Opportunity).filter(Opportunity.url == p["url"]).first()]
+    dead_urls = filter_dead_urls([p["url"] for p in unchecked])
+
+    for program in unchecked:
+        if program["url"] in dead_urls:
             logger.info("Skipping dead link for %s: %s", program["title"], program["url"])
             continue
 

@@ -12,6 +12,8 @@ export type Opportunity = {
   deadline: string | null;
   is_rolling: boolean;
   dilution_type: string | null;
+  tier: string | null;
+  domain: string | null;
   published_at: string | null;
   discovered_at: string;
   score: number;
@@ -42,6 +44,8 @@ export function fetchOpportunities(params: {
   geography?: string;
   dilutionType?: string;
   isRolling?: boolean;
+  tier?: string;
+  domain?: string;
 }): Promise<Opportunity[]> {
   const search = new URLSearchParams();
   if (params.category) search.set("category", params.category);
@@ -54,6 +58,8 @@ export function fetchOpportunities(params: {
   if (params.geography) search.set("geography", params.geography);
   if (params.dilutionType) search.set("dilution_type", params.dilutionType);
   if (params.isRolling !== undefined) search.set("is_rolling", String(params.isRolling));
+  if (params.tier) search.set("tier", params.tier);
+  if (params.domain) search.set("domain", params.domain);
   return apiGet(`/api/opportunities?${search.toString()}`);
 }
 
@@ -71,4 +77,13 @@ export function fetchResearchSubcategories(): Promise<Record<string, number>> {
 
 export function fetchStartupSubtypes(): Promise<Record<string, number>> {
   return apiGet(`/api/opportunities/startup/subtypes`);
+}
+
+export function fetchCompetitionTiers(): Promise<Record<string, number>> {
+  return apiGet(`/api/opportunities/competitions/tiers`);
+}
+
+export function fetchCompetitionDomains(tier?: string): Promise<Record<string, number>> {
+  const search = tier ? `?tier=${encodeURIComponent(tier)}` : "";
+  return apiGet(`/api/opportunities/competitions/domains${search}`);
 }

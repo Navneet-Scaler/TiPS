@@ -154,7 +154,7 @@ export default function StartupView({ query }: { query: string }) {
               Always Open &middot; rolling, no fixed deadline
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {rolling.map((o) => (
               <OpportunityCard key={o.id} opportunity={o} />
             ))}
@@ -165,7 +165,7 @@ export default function StartupView({ query }: { query: string }) {
       <div className="text-[11px] uppercase tracking-wider text-base-muted mb-3">
         {loading ? "Loading" : `Open / Closing Soon (${deadlineBased.length})`}
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {deadlineBased.map((o) => (
           <OpportunityCard key={o.id} opportunity={o} />
         ))}

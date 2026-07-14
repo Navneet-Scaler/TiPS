@@ -10,6 +10,7 @@ import httpx
 from dateutil import parser as date_parser
 from sqlalchemy.orm import Session
 
+from ..classify import classify_ai_domain
 from ..models import Opportunity, Source
 from .sources import DEVPOST_SEARCH_TERMS
 from .utils import safe_add
@@ -70,13 +71,17 @@ def run(db: Session) -> dict:
                 deadline = _parse_deadline(h.get("submission_period_dates"))
                 location = (h.get("displayed_location") or {}).get("location", "Online")
                 prizes = h.get("prizes_counts", {}) or {}
+                title = h.get("title", "Untitled hackathon")
+                summary = f"Hosted by {h.get('organization_name', 'Devpost')}. {h.get('registrations_count', 0)} registered."
 
                 added = safe_add(db, Opportunity(
-                    title=h.get("title", "Untitled hackathon"),
-                    summary=f"Hosted by {h.get('organization_name', 'Devpost')}. {h.get('registrations_count', 0)} registered.",
+                    title=title,
+                    summary=summary,
                     url=url,
                     category="Competitions",
                     subcategory="Hackathon",
+                    tier="tier1",
+                    domain=classify_ai_domain(title, summary),
                     organization=h.get("organization_name") or "Devpost",
                     geography=location,
                     is_remote=location.lower() in ("online", "anywhere"),

@@ -74,6 +74,65 @@ def classify_research_subcategory(title: str, summary: str) -> Optional[str]:
     return None
 
 
+# Startup tab sub-types, ordered so more specific programs win over the
+# generic "accelerator" bucket. dilution_type is inferred separately below.
+STARTUP_SUBCATEGORY_KEYWORDS = [
+    ("Co-founder Matching", [
+        "looking for a co-founder", "seeking co-founder", "co-founder matching", "cofounder matching",
+    ]),
+    ("Compute/Credit Program", [
+        "gpu credits", "cloud credits", "compute credits", "api credits", "credits for startups",
+    ]),
+    ("Pitch Competition", [
+        "pitch competition", "pitch contest", "cash prize", "pitch day",
+    ]),
+    ("Demo Day", [
+        "demo day",
+    ]),
+    ("Venture Studio", [
+        "venture studio", "co-building", "pre-team",
+    ]),
+    ("Founder Fellowship", [
+        "founder fellowship", "entrepreneur in residence", "eir program",
+    ]),
+    ("Startup Visa / Relocation", [
+        "startup visa", "global talent visa", "tech visa", "relocation program",
+    ]),
+    ("Grant (non-dilutive)", [
+        "non-dilutive", "non dilutive", "startup grant", "innovation grant", "seed fund scheme",
+    ]),
+    ("Incubator", [
+        "incubator", "incubation",
+    ]),
+    ("Accelerator", [
+        "accelerator", "cohort", "batch",
+    ]),
+]
+
+DILUTION_EQUITY_KEYWORDS = ["equity", "safe note", "convertible", "% stake", "takes equity"]
+DILUTION_NONDILUTIVE_KEYWORDS = [
+    "equity-free", "equity free", "non-dilutive", "non dilutive", "no equity",
+    "free gpu", "free credits", "grant", "no stake",
+]
+
+
+def classify_startup_subcategory(title: str, summary: str) -> Optional[str]:
+    text = f"{title} {summary or ''}".lower()
+    for subcategory, keywords in STARTUP_SUBCATEGORY_KEYWORDS:
+        if any(kw in text for kw in keywords):
+            return subcategory
+    return None
+
+
+def classify_dilution_type(title: str, summary: str) -> str:
+    text = f"{title} {summary or ''}".lower()
+    if any(kw in text for kw in DILUTION_NONDILUTIVE_KEYWORDS):
+        return "non-dilutive"
+    if any(kw in text for kw in DILUTION_EQUITY_KEYWORDS):
+        return "equity"
+    return "unknown"
+
+
 FUNDED_KEYWORDS = [
     "funded", "stipend", "salary", "paid fellowship", "compensation", "living stipend",
     "grant of", "$", "fully funded",

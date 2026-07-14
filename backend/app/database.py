@@ -16,3 +16,16 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def run_light_migrations():
+    """SQLite has no ALTER-based migration tool wired up yet, so newly added
+    columns are patched in directly. Safe to call every startup - each ADD
+    COLUMN is wrapped so an already-migrated DB just no-ops."""
+    with engine.connect() as conn:
+        existing_cols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(opportunities)")}
+        if "is_rolling" not in existing_cols:
+            conn.exec_driver_sql("ALTER TABLE opportunities ADD COLUMN is_rolling BOOLEAN DEFAULT 0")
+        if "dilution_type" not in existing_cols:
+            conn.exec_driver_sql("ALTER TABLE opportunities ADD COLUMN dilution_type VARCHAR")
+        conn.commit()

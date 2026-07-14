@@ -42,6 +42,8 @@ class Opportunity(Base):
     is_remote = Column(Boolean, default=False)
     is_paid = Column(Boolean, default=False)
     deadline = Column(DateTime, nullable=True)
+    is_rolling = Column(Boolean, default=False)  # explicit "no fixed deadline" vs unknown
+    dilution_type = Column(String, nullable=True)  # equity / non-dilutive / unknown
 
     published_at = Column(DateTime, nullable=True, index=True)
     discovered_at = Column(DateTime, default=datetime.utcnow, index=True)

@@ -4,7 +4,14 @@ from datetime import datetime, timezone
 import feedparser
 from sqlalchemy.orm import Session
 
-from ..classify import classify, classify_research_subcategory, is_funded, score
+from ..classify import (
+    classify,
+    classify_dilution_type,
+    classify_research_subcategory,
+    classify_startup_subcategory,
+    is_funded,
+    score,
+)
 from ..models import Opportunity, Source
 from .sources import RSS_SOURCES
 from .utils import safe_add
@@ -45,12 +52,21 @@ def fetch_source(db: Session, source: Source, organization: str) -> int:
         recency_days = max((now - published_at).total_seconds() / 86400, 0)
         category = classify(title, summary)
 
+        subcategory = None
+        dilution_type = None
+        if category == "Research":
+            subcategory = classify_research_subcategory(title, summary)
+        elif category == "Startup":
+            subcategory = classify_startup_subcategory(title, summary)
+            dilution_type = classify_dilution_type(title, summary)
+
         opp = Opportunity(
             title=title,
             summary=summary[:1000] if summary else None,
             url=url,
             category=category,
-            subcategory=classify_research_subcategory(title, summary) if category == "Research" else None,
+            subcategory=subcategory,
+            dilution_type=dilution_type,
             organization=organization,
             geography="Global",
             is_paid=is_funded(title, summary),

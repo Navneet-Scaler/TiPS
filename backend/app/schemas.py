@@ -18,6 +18,8 @@ class OpportunityOut(BaseModel):
     is_remote: bool
     is_paid: bool
     deadline: Optional[datetime] = None
+    is_rolling: bool = False
+    dilution_type: Optional[str] = None
     published_at: Optional[datetime] = None
     discovered_at: datetime
     score: float

@@ -21,6 +21,8 @@ def list_opportunities(
     geography: Optional[str] = None,
     is_remote: Optional[bool] = None,
     is_paid: Optional[bool] = None,
+    dilution_type: Optional[str] = None,
+    is_rolling: Optional[bool] = None,
     sort: str = Query("recent", pattern="^(recent|trending)$"),
     limit: int = 60,
     offset: int = 0,
@@ -37,6 +39,10 @@ def list_opportunities(
         query = query.filter(Opportunity.is_remote == is_remote)
     if is_paid is not None:
         query = query.filter(Opportunity.is_paid == is_paid)
+    if dilution_type:
+        query = query.filter(Opportunity.dilution_type == dilution_type)
+    if is_rolling is not None:
+        query = query.filter(Opportunity.is_rolling == is_rolling)
     if q:
         like = f"%{q}%"
         query = query.filter((Opportunity.title.ilike(like)) | (Opportunity.summary.ilike(like)) | (Opportunity.organization.ilike(like)))
@@ -66,6 +72,18 @@ def research_subcategories(db: Session = Depends(get_db)):
     rows = (
         db.query(Opportunity.subcategory, func.count(Opportunity.id))
         .filter(Opportunity.category == "Research")
+        .group_by(Opportunity.subcategory)
+        .order_by(func.count(Opportunity.id).desc())
+        .all()
+    )
+    return {(sub or "General"): count for sub, count in rows}
+
+
+@router.get("/startup/subtypes")
+def startup_subtypes(db: Session = Depends(get_db)):
+    rows = (
+        db.query(Opportunity.subcategory, func.count(Opportunity.id))
+        .filter(Opportunity.category == "Startup")
         .group_by(Opportunity.subcategory)
         .order_by(func.count(Opportunity.id).desc())
         .all()

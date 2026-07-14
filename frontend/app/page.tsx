@@ -8,6 +8,7 @@ import OpportunityCard from "@/components/OpportunityCard";
 import Timeline from "@/components/Timeline";
 import CategoryBars from "@/components/CategoryBars";
 import ResearchView from "@/components/ResearchView";
+import StartupView from "@/components/StartupView";
 import { ALL_NAV_ITEMS } from "@/lib/categories";
 import { fetchOpportunities, fetchStats, fetchTimeline, Opportunity, Stats } from "@/lib/api";
 
@@ -26,9 +27,10 @@ export default function Page() {
   const activeItem = useMemo(() => ALL_NAV_ITEMS.find((i) => i.key === active), [active]);
 
   const isResearch = active === "research";
+  const isStartup = active === "startup";
 
   useEffect(() => {
-    if (isResearch) {
+    if (isResearch || isStartup) {
       setLoading(false);
       return;
     }
@@ -56,7 +58,7 @@ export default function Page() {
     return () => {
       cancelled = true;
     };
-  }, [active, query, activeItem, isResearch]);
+  }, [active, query, activeItem, isResearch, isStartup]);
 
   const loadMore = () => {
     const sort = active === "trending" ? "trending" : "recent";
@@ -131,6 +133,8 @@ export default function Page() {
           </div>
         ) : isResearch ? (
           <ResearchView query={query} />
+        ) : isStartup ? (
+          <StartupView query={query} />
         ) : (
           <div>
             <div className="text-[11px] uppercase tracking-wider text-base-muted mb-3">

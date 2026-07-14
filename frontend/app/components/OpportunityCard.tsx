@@ -21,9 +21,20 @@ function deadlineLabel(iso: string | null): string | null {
   return `closes in ${days}d`;
 }
 
+const DILUTION_STYLE: Record<string, string> = {
+  equity: "text-orange-300 bg-orange-500/10",
+  "non-dilutive": "text-emerald-300 bg-emerald-500/10",
+};
+
 export default function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
   const color = colorForCategory(opportunity.category);
   const deadline = deadlineLabel(opportunity.deadline);
+  const dilutionLabel =
+    opportunity.dilution_type === "non-dilutive"
+      ? "non-dilutive"
+      : opportunity.dilution_type === "equity"
+      ? "equity"
+      : null;
 
   return (
     <a
@@ -33,13 +44,18 @@ export default function OpportunityCard({ opportunity }: { opportunity: Opportun
       className="group block bg-base-panel border border-base-border rounded-xl p-4 hover:border-accent/50 transition-colors"
     >
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span
             className="text-[10px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full"
             style={{ color, backgroundColor: `${color}22` }}
           >
             {opportunity.category}
           </span>
+          {dilutionLabel && (
+            <span className={`text-[10px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full ${DILUTION_STYLE[dilutionLabel]}`}>
+              {dilutionLabel}
+            </span>
+          )}
           {opportunity.organization && (
             <span className="text-[11px] text-base-muted">{opportunity.organization}</span>
           )}
@@ -69,11 +85,18 @@ export default function OpportunityCard({ opportunity }: { opportunity: Opportun
             <span>remote</span>
           </>
         )}
-        {deadline && (
+        {opportunity.is_rolling ? (
           <>
             <span>&middot;</span>
-            <span className={deadline.includes("today") ? "text-amber-400" : ""}>{deadline}</span>
+            <span className="text-sky-400">rolling</span>
           </>
+        ) : (
+          deadline && (
+            <>
+              <span>&middot;</span>
+              <span className={deadline.includes("today") ? "text-amber-400" : ""}>{deadline}</span>
+            </>
+          )
         )}
       </div>
     </a>

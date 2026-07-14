@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import Base, engine, SessionLocal
+from .database import Base, engine, SessionLocal, run_light_migrations
 from .routes.opportunities import router as opportunities_router
 from .ingestion.orchestrator import run_all
 from .scheduler import start_scheduler
@@ -13,6 +13,7 @@ from . import seed
 logging.basicConfig(level=logging.INFO)
 
 Base.metadata.create_all(bind=engine)
+run_light_migrations()
 
 app = FastAPI(title="TIPS - Talent Intelligence & Personal Signals API")
 

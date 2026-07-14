@@ -10,6 +10,8 @@ export type Opportunity = {
   is_remote: boolean;
   is_paid: boolean;
   deadline: string | null;
+  is_rolling: boolean;
+  dilution_type: string | null;
   published_at: string | null;
   discovered_at: string;
   score: number;
@@ -37,6 +39,9 @@ export function fetchOpportunities(params: {
   limit?: number;
   offset?: number;
   isPaid?: boolean;
+  geography?: string;
+  dilutionType?: string;
+  isRolling?: boolean;
 }): Promise<Opportunity[]> {
   const search = new URLSearchParams();
   if (params.category) search.set("category", params.category);
@@ -46,6 +51,9 @@ export function fetchOpportunities(params: {
   if (params.limit) search.set("limit", String(params.limit));
   if (params.offset) search.set("offset", String(params.offset));
   if (params.isPaid) search.set("is_paid", "true");
+  if (params.geography) search.set("geography", params.geography);
+  if (params.dilutionType) search.set("dilution_type", params.dilutionType);
+  if (params.isRolling !== undefined) search.set("is_rolling", String(params.isRolling));
   return apiGet(`/api/opportunities?${search.toString()}`);
 }
 
@@ -59,4 +67,8 @@ export function fetchStats(): Promise<Stats> {
 
 export function fetchResearchSubcategories(): Promise<Record<string, number>> {
   return apiGet(`/api/opportunities/research/subcategories`);
+}
+
+export function fetchStartupSubtypes(): Promise<Record<string, number>> {
+  return apiGet(`/api/opportunities/startup/subtypes`);
 }

@@ -35,6 +35,7 @@ export function fetchOpportunities(params: {
   q?: string;
   sort?: "recent" | "trending";
   limit?: number;
+  offset?: number;
   isPaid?: boolean;
 }): Promise<Opportunity[]> {
   const search = new URLSearchParams();
@@ -43,6 +44,7 @@ export function fetchOpportunities(params: {
   if (params.q) search.set("q", params.q);
   if (params.sort) search.set("sort", params.sort);
   if (params.limit) search.set("limit", String(params.limit));
+  if (params.offset) search.set("offset", String(params.offset));
   if (params.isPaid) search.set("is_paid", "true");
   return apiGet(`/api/opportunities?${search.toString()}`);
 }

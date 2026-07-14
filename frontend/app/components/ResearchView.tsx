@@ -17,16 +17,21 @@ const SUBCATEGORY_ORDER = [
   "General",
 ];
 
+const PAGE_SIZE = 80;
+
 export default function ResearchView({ query }: { query: string }) {
   const [items, setItems] = useState<Opportunity[]>([]);
   const [subcounts, setSubcounts] = useState<Record<string, number>>({});
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [fundedOnly, setFundedOnly] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setHasMore(true);
 
     Promise.all([
       fetchOpportunities({
@@ -34,7 +39,7 @@ export default function ResearchView({ query }: { query: string }) {
         subcategory: activeSubcategory ?? undefined,
         q: query || undefined,
         isPaid: fundedOnly || undefined,
-        limit: 80,
+        limit: PAGE_SIZE,
       }),
       fetchResearchSubcategories(),
     ])
@@ -42,6 +47,7 @@ export default function ResearchView({ query }: { query: string }) {
         if (cancelled) return;
         setItems(opps);
         setSubcounts(subs);
+        setHasMore(opps.length === PAGE_SIZE);
       })
       .finally(() => !cancelled && setLoading(false));
 
@@ -49,6 +55,23 @@ export default function ResearchView({ query }: { query: string }) {
       cancelled = true;
     };
   }, [query, activeSubcategory, fundedOnly]);
+
+  const loadMore = () => {
+    setLoadingMore(true);
+    fetchOpportunities({
+      category: "Research",
+      subcategory: activeSubcategory ?? undefined,
+      q: query || undefined,
+      isPaid: fundedOnly || undefined,
+      limit: PAGE_SIZE,
+      offset: items.length,
+    })
+      .then((more) => {
+        setItems((prev) => [...prev, ...more]);
+        setHasMore(more.length === PAGE_SIZE);
+      })
+      .finally(() => setLoadingMore(false));
+  };
 
   const collaborators = useMemo(
     () => items.filter((o) => o.subcategory === "Seeking Collaborators" || o.subcategory === "Recruiting Students"),
@@ -130,6 +153,17 @@ export default function ResearchView({ query }: { query: string }) {
       {!loading && items.length === 0 && (
         <div className="text-sm text-base-muted py-16 text-center">
           Nothing here yet for this filter combination.
+        </div>
+      )}
+      {!loading && hasMore && items.length > 0 && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="px-4 py-2 rounded-lg border border-base-border text-[13px] text-base-muted hover:text-base-text hover:border-accent/50 transition-colors disabled:opacity-50"
+          >
+            {loadingMore ? "Loading..." : "Load more"}
+          </button>
         </div>
       )}
     </div>

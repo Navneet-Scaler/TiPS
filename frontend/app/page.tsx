@@ -11,6 +11,8 @@ import ResearchView from "@/components/ResearchView";
 import { ALL_NAV_ITEMS } from "@/lib/categories";
 import { fetchOpportunities, fetchStats, fetchTimeline, Opportunity, Stats } from "@/lib/api";
 
+const PAGE_SIZE = 60;
+
 export default function Page() {
   const [active, setActive] = useState("home");
   const [query, setQuery] = useState("");
@@ -18,6 +20,8 @@ export default function Page() {
   const [timelineItems, setTimelineItems] = useState<Opportunity[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const activeItem = useMemo(() => ALL_NAV_ITEMS.find((i) => i.key === active), [active]);
 
@@ -30,12 +34,13 @@ export default function Page() {
     }
     let cancelled = false;
     setLoading(true);
+    setHasMore(true);
 
     const sort = active === "trending" ? "trending" : "recent";
     const category = active === "timeline" || active === "calendar" ? undefined : activeItem?.category;
 
     Promise.all([
-      fetchOpportunities({ category, q: query || undefined, sort, limit: 60 }),
+      fetchOpportunities({ category, q: query || undefined, sort, limit: PAGE_SIZE }),
       fetchStats(),
       fetchTimeline(72),
     ])
@@ -44,6 +49,7 @@ export default function Page() {
         setOpportunities(opps);
         setStats(s);
         setTimelineItems(tl);
+        setHasMore(opps.length === PAGE_SIZE);
       })
       .finally(() => !cancelled && setLoading(false));
 
@@ -51,6 +57,19 @@ export default function Page() {
       cancelled = true;
     };
   }, [active, query, activeItem, isResearch]);
+
+  const loadMore = () => {
+    const sort = active === "trending" ? "trending" : "recent";
+    const category = active === "timeline" || active === "calendar" ? undefined : activeItem?.category;
+
+    setLoadingMore(true);
+    fetchOpportunities({ category, q: query || undefined, sort, limit: PAGE_SIZE, offset: opportunities.length })
+      .then((more) => {
+        setOpportunities((prev) => [...prev, ...more]);
+        setHasMore(more.length === PAGE_SIZE);
+      })
+      .finally(() => setLoadingMore(false));
+  };
 
   const filtered = useMemo(() => {
     if (active === "closing") return opportunities.filter((o) => o.deadline);
@@ -115,7 +134,9 @@ export default function Page() {
         ) : (
           <div>
             <div className="text-[11px] uppercase tracking-wider text-base-muted mb-3">
-              {loading ? "Loading" : `${filtered.length} opportunities`}
+              {loading
+                ? "Loading"
+                : `${filtered.length} loaded${stats?.by_category && activeItem?.category ? ` of ${stats.by_category[activeItem.category] ?? filtered.length}` : ""}`}
             </div>
             <div className="grid grid-cols-2 gap-3">
               {filtered.map((o) => (
@@ -125,6 +146,17 @@ export default function Page() {
             {!loading && filtered.length === 0 && (
               <div className="text-sm text-base-muted py-16 text-center">
                 Nothing here yet — the radar checks sources every 30 minutes.
+              </div>
+            )}
+            {!loading && hasMore && filtered.length > 0 && (
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="px-4 py-2 rounded-lg border border-base-border text-[13px] text-base-muted hover:text-base-text hover:border-accent/50 transition-colors disabled:opacity-50"
+                >
+                  {loadingMore ? "Loading..." : "Load more"}
+                </button>
               </div>
             )}
           </div>

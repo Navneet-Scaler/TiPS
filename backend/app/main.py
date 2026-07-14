@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine, SessionLocal, run_light_migrations
 from .routes.opportunities import router as opportunities_router
 from .ingestion.orchestrator import run_all
+from .ingestion.cleanup import run_cleanup
 from .scheduler import start_scheduler
 from . import seed
 
@@ -43,6 +44,16 @@ def trigger_ingestion():
     db = SessionLocal()
     try:
         results = run_all(db)
+        return {"results": results}
+    finally:
+        db.close()
+
+
+@app.post("/api/admin/cleanup")
+def trigger_cleanup():
+    db = SessionLocal()
+    try:
+        results = run_cleanup(db)
         return {"results": results}
     finally:
         db.close()

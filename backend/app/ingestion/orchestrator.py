@@ -5,7 +5,7 @@ import logging
 
 from sqlalchemy.orm import Session
 
-from . import rss, reddit, hackernews, github, greenhouse, openreview, research_registry, startup_registry
+from . import rss, reddit, hackernews, github, greenhouse, research_registry, startup_registry, devpost, unstop
 
 logger = logging.getLogger("tips.ingestion.orchestrator")
 
@@ -15,7 +15,8 @@ CONNECTORS = {
     "hackernews": hackernews.run,
     "github": github.run,
     "greenhouse": greenhouse.run,
-    "openreview": openreview.run,
+    "devpost": devpost.run,
+    "unstop": unstop.run,
     "research_registry": research_registry.run,
     "startup_registry": startup_registry.run,
 }

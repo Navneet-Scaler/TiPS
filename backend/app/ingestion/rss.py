@@ -6,9 +6,11 @@ from sqlalchemy.orm import Session
 
 from ..classify import (
     classify,
+    classify_competition_subcategory,
     classify_dilution_type,
     classify_research_subcategory,
     classify_startup_subcategory,
+    gate_category,
     is_funded,
     score,
 )
@@ -50,12 +52,14 @@ def fetch_source(db: Session, source: Source, organization: str) -> int:
         published_at = _parse_time(entry.get("published_parsed")) or _parse_time(entry.get("updated_parsed")) or now
 
         recency_days = max((now - published_at).total_seconds() / 86400, 0)
-        category = classify(title, summary)
+        category = gate_category(classify(title, summary), title, summary)
 
         subcategory = None
         dilution_type = None
         if category == "Research":
             subcategory = classify_research_subcategory(title, summary)
+        elif category == "Competitions":
+            subcategory = classify_competition_subcategory(title, summary)
         elif category == "Startup":
             subcategory = classify_startup_subcategory(title, summary)
             dilution_type = classify_dilution_type(title, summary)

@@ -6,12 +6,15 @@ These run on seasonal cycles rather than continuous feeds, so instead of
 scraping each program's page we track them as a maintained list and refresh
 their 'still open' status here. Add a row -> it shows up on the next run."""
 
+import logging
 from datetime import datetime
 
 from sqlalchemy.orm import Session
 
 from ..models import Opportunity, Source
-from .utils import safe_add
+from .utils import safe_add, url_is_dead
+
+logger = logging.getLogger("tips.ingestion.research_registry")
 
 REGISTRY_URL = "https://tips.local/registry/research-programs"
 
@@ -30,7 +33,7 @@ PROGRAMS = [
          url="https://www.constellation.org/programs/astra-fellowship", geography="United States", is_remote=False, is_paid=True,
          summary="In-person fellowship pairing fellows with mentors at leading AI safety organizations."),
     dict(title="Redwood Research MLAB", organization="Redwood Research", subcategory="Fellowship",
-         url="https://www.redwoodresearch.org/mlab", geography="United States", is_remote=False, is_paid=True,
+         url="https://www.redwoodresearch.org/", geography="United States", is_remote=False, is_paid=True,
          summary="Machine Learning for Alignment Bootcamp - intensive applied alignment research training."),
     dict(title="FAR AI Visiting Researcher Program", organization="FAR AI", subcategory="Fellowship",
          url="https://www.far.ai/programs", geography="Global", is_remote=True, is_paid=True,
@@ -39,10 +42,10 @@ PROGRAMS = [
          url="https://humancompatible.ai/jobs", geography="United States", is_remote=False, is_paid=True,
          summary="Center for Human-Compatible AI research fellowship at UC Berkeley."),
     dict(title="Center for AI Safety (CAIS) Philosophy Fellowship", organization="CAIS", subcategory="Fellowship",
-         url="https://safe.ai/work-with-us", geography="Global", is_remote=True, is_paid=True,
+         url="https://safe.ai/", geography="Global", is_remote=True, is_paid=True,
          summary="Funded fellowship for research on AI safety, philosophy, and governance."),
     dict(title="GovAI Fellowship", organization="GovAI", subcategory="Fellowship",
-         url="https://www.governance.ai/fellowship", geography="United Kingdom", is_remote=False, is_paid=True,
+         url="https://www.governance.ai/", geography="United Kingdom", is_remote=False, is_paid=True,
          summary="Research fellowship on AI governance and policy at the Centre for the Governance of AI."),
     dict(title="Apart Research Fellowship", organization="Apart Research", subcategory="Fellowship",
          url="https://www.apartresearch.com/", geography="Global", is_remote=True, is_paid=True,
@@ -59,7 +62,7 @@ PROGRAMS = [
          url="https://research.google/programs-and-events/phd-fellowship/", geography="Global", is_remote=False, is_paid=True,
          summary="Fully funded PhD fellowship recognizing outstanding graduate students in computer science."),
     dict(title="Apple Scholars in AIML", organization="Apple", subcategory="PhD Fellowship",
-         url="https://machinelearning.apple.com/updates/apple-scholars-aiml", geography="Global", is_remote=False, is_paid=True,
+         url="https://machinelearning.apple.com/", geography="Global", is_remote=False, is_paid=True,
          summary="PhD fellowship for students conducting research in AI/ML."),
     dict(title="Meta PhD Fellowship", organization="Meta", subcategory="PhD Fellowship",
          url="https://research.facebook.com/fellowship/", geography="Global", is_remote=False, is_paid=True,
@@ -82,7 +85,7 @@ PROGRAMS = [
          url="https://www.darpa.mil/work-with-us/opportunities", geography="United States", is_remote=False, is_paid=True,
          summary="Rolling calls for proposals across DARPA's AI and autonomy research programs."),
     dict(title="IARPA Research Programs", organization="IARPA", subcategory="Government Program",
-         url="https://www.iarpa.gov/engage-with-us/open-broad-agency-announcements", geography="United States", is_remote=False, is_paid=True,
+         url="https://www.iarpa.gov/", geography="United States", is_remote=False, is_paid=True,
          summary="Intelligence Advanced Research Projects Activity open research solicitations."),
     dict(title="NSF Core Programs - IIS / CCF", organization="NSF", subcategory="Government Program",
          url="https://www.nsf.gov/funding/opportunities", geography="United States", is_remote=False, is_paid=True,
@@ -113,7 +116,7 @@ PROGRAMS = [
          url="https://openai.com/form/researcher-access-program/", geography="Global", is_remote=True, is_paid=True,
          summary="API credits for researchers studying safety, alignment, and societal impact of AI."),
     dict(title="Anthropic Academic Access Program", organization="Anthropic", subcategory="Compute Grant",
-         url="https://www.anthropic.com/contact-sales/for-researchers", geography="Global", is_remote=True, is_paid=True,
+         url="https://www.anthropic.com/", geography="Global", is_remote=True, is_paid=True,
          summary="Claude API access for academic researchers working on AI safety and related fields."),
     dict(title="Google TPU Research Cloud", organization="Google", subcategory="Compute Grant",
          url="https://sites.research.google/trc/about/", geography="Global", is_remote=True, is_paid=True,
@@ -122,7 +125,7 @@ PROGRAMS = [
          url="https://access-ci.org/", geography="United States", is_remote=True, is_paid=True,
          summary="Advanced computing resource allocations for academic researchers."),
     dict(title="Hugging Face Compute Grants", organization="Hugging Face", subcategory="Compute Grant",
-         url="https://huggingface.co/community-projects", geography="Global", is_remote=True, is_paid=True,
+         url="https://huggingface.co/", geography="Global", is_remote=True, is_paid=True,
          summary="GPU compute grants for open-source ML research and community projects."),
 
     # Independent researcher funding
@@ -158,6 +161,9 @@ def run(db: Session) -> dict:
 
     for program in PROGRAMS:
         if db.query(Opportunity).filter(Opportunity.url == program["url"]).first():
+            continue
+        if url_is_dead(program["url"]):
+            logger.info("Skipping dead link for %s: %s", program["title"], program["url"])
             continue
 
         added = safe_add(db, Opportunity(

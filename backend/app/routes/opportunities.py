@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -23,11 +23,16 @@ def list_opportunities(
     is_paid: Optional[bool] = None,
     dilution_type: Optional[str] = None,
     is_rolling: Optional[bool] = None,
+    include_expired: bool = False,
     sort: str = Query("recent", pattern="^(recent|trending)$"),
     limit: int = 60,
     offset: int = 0,
 ):
     query = db.query(Opportunity)
+
+    if not include_expired:
+        now = datetime.utcnow()
+        query = query.filter(or_(Opportunity.deadline.is_(None), Opportunity.deadline >= now))
 
     if category:
         query = query.filter(Opportunity.category == category)

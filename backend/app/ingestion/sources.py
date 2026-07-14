@@ -12,15 +12,11 @@ RSS_SOURCES = [
     {"name": "Meta AI Blog", "url": "https://ai.meta.com/blog/rss/", "organization": "Meta AI"},
     {"name": "Berkeley AI Research", "url": "https://bair.berkeley.edu/blog/feed.xml", "organization": "Berkeley BAIR"},
 
-    # Research - arXiv subdomains (NLP, CV, RL, robotics, multi-agent, HCI)
-    {"name": "arXiv cs.AI", "url": "http://export.arxiv.org/rss/cs.AI", "organization": "arXiv"},
-    {"name": "arXiv cs.LG", "url": "http://export.arxiv.org/rss/cs.LG", "organization": "arXiv"},
-    {"name": "arXiv cs.CL", "url": "http://export.arxiv.org/rss/cs.CL", "organization": "arXiv"},
-    {"name": "arXiv cs.CV", "url": "http://export.arxiv.org/rss/cs.CV", "organization": "arXiv"},
-    {"name": "arXiv cs.RO", "url": "http://export.arxiv.org/rss/cs.RO", "organization": "arXiv"},
-    {"name": "arXiv cs.MA", "url": "http://export.arxiv.org/rss/cs.MA", "organization": "arXiv"},
-    {"name": "arXiv cs.HC", "url": "http://export.arxiv.org/rss/cs.HC", "organization": "arXiv"},
-    {"name": "arXiv stat.ML", "url": "http://export.arxiv.org/rss/stat.ML", "organization": "arXiv"},
+    # NOTE: arXiv paper feeds were removed - a paper is not an opportunity
+    # (no application action), and their abstracts were false-positive
+    # matching into Research/Competitions via generic words like "research"
+    # and "challenge". Real research opportunities come from the sources
+    # below and the curated registry instead.
 
     # AI Safety / Alignment research ecosystem - the plan's "hidden signal" tier
     {"name": "LessWrong (AI)", "url": "https://www.lesswrong.com/feed.xml?view=curated-rss", "organization": "LessWrong"},
@@ -42,9 +38,6 @@ RSS_SOURCES = [
     {"name": "Vercel Blog", "url": "https://vercel.com/atom", "organization": "Vercel"},
     {"name": "Docker Blog", "url": "https://www.docker.com/blog/feed/", "organization": "Docker"},
 
-    # Competitions / hackathons
-    {"name": "Devpost Software Challenges", "url": "https://devpost.com/software/challenges.rss", "organization": "Devpost"},
-
     # Foundations / open source
     {"name": "Linux Foundation Blog", "url": "https://www.linuxfoundation.org/blog/rss.xml", "organization": "Linux Foundation"},
 ]
@@ -63,9 +56,15 @@ REDDIT_SUBREDDITS = [
     "gradadmissions",
 ]
 
-HN_KEYWORDS = ["AI hackathon", "AI fellowship", "AI residency", "open source AI", "AI grant", "AI internship"]
+HN_KEYWORDS = ["AI hackathon", "AI fellowship", "AI residency", "AI research grant"]
 
 GITHUB_TOPICS = ["ai-agents", "llm", "machine-learning", "generative-ai"]
+
+# Search terms run against Devpost's and Unstop's public search APIs each
+# cycle - both return live, open, deadline-bearing hackathons directly, no
+# scraping needed.
+DEVPOST_SEARCH_TERMS = ["artificial intelligence", "machine learning", "LLM", "generative AI", "AI agents"]
+UNSTOP_SEARCH_TERMS = ["artificial intelligence", "machine learning", "AI hackathon", "data science"]
 
 # Greenhouse job-board tokens (the string in boards-api.greenhouse.io/v1/boards/<token>/jobs)
 GREENHOUSE_BOARDS = [

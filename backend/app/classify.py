@@ -1,13 +1,28 @@
 """Keyword-based classification. Deliberately simple for V1 -
 swap for an LLM enrichment pass later without changing callers."""
 
+import re
 from typing import Optional
+
+
+def _has_keyword(text: str, keyword: str) -> bool:
+    """Word-boundary match - a plain `in` check would match "residency"
+    inside "presidency" or "ai" inside half the English language. Symbol-only
+    keywords (e.g. "$") have no word boundary to anchor on, so those fall
+    back to a plain substring check."""
+    if not keyword[0].isalnum() and not keyword[-1].isalnum():
+        return keyword in text
+    return re.search(rf"\b{re.escape(keyword)}\b", text) is not None
+
+
+def _any_keyword(text: str, keywords: list) -> bool:
+    return any(_has_keyword(text, kw) for kw in keywords)
 
 CATEGORY_KEYWORDS = {
     "Career": ["hiring", "job", "career", "we're hiring", "join our team", "recruiting", "internship", "new grad"],
-    "Research": ["research", "fellowship", "residency", "phd", "postdoc", "call for papers", "cfp", "paper"],
+    "Research": ["fellowship", "residency", "postdoc", "call for papers", "cfp", "research grant", "phd position"],
     "Learning": ["course", "workshop", "tutorial", "bootcamp", "webinar", "masterclass", "certification"],
-    "Competitions": ["hackathon", "competition", "challenge", "kaggle"],
+    "Competitions": ["hackathon", "kaggle competition", "pitch competition", "case competition", "coding challenge"],
     "Funding": ["grant", "credits", "funding", "sponsorship", "scholarship"],
     "Open Source": ["open source", "github", "release", "sdk", "library", "contribute"],
     "Startup": ["accelerator", "incubator", "startup", "demo day", "pitch"],
@@ -59,7 +74,7 @@ def classify(title: str, summary: str) -> str:
     best_category = DEFAULT_CATEGORY
     best_hits = 0
     for category, keywords in CATEGORY_KEYWORDS.items():
-        hits = sum(1 for kw in keywords if kw in text)
+        hits = sum(1 for kw in keywords if _has_keyword(text, kw))
         if hits > best_hits:
             best_hits = hits
             best_category = category
@@ -69,9 +84,57 @@ def classify(title: str, summary: str) -> str:
 def classify_research_subcategory(title: str, summary: str) -> Optional[str]:
     text = f"{title} {summary or ''}".lower()
     for subcategory, keywords in RESEARCH_SUBCATEGORY_KEYWORDS:
-        if any(kw in text for kw in keywords):
+        if _any_keyword(text, keywords):
             return subcategory
     return None
+
+
+# Competition sub-types. Requires an actual "you can enter this" signal -
+# a paper that happens to use the word "challenge" in its abstract must not
+# match here, which is why single generic words are avoided.
+COMPETITION_SUBCATEGORY_KEYWORDS = [
+    ("Hackathon", [
+        "hackathon", "hack night", "build weekend", "submit your project", "start a submission",
+    ]),
+    ("ML Competition", [
+        "kaggle competition", "leaderboard", "benchmark competition", "shared task",
+    ]),
+    ("Pitch Competition", [
+        "pitch competition", "pitch contest", "demo day pitch",
+    ]),
+    ("Case Competition", [
+        "case competition",
+    ]),
+    ("Government Challenge", [
+        "grand challenge", "innovation challenge", "national challenge",
+    ]),
+]
+
+
+def classify_competition_subcategory(title: str, summary: str) -> Optional[str]:
+    text = f"{title} {summary or ''}".lower()
+    for subcategory, keywords in COMPETITION_SUBCATEGORY_KEYWORDS:
+        if _any_keyword(text, keywords):
+            return subcategory
+    return None
+
+
+# Categories that require a real opportunity-shaped signal before an item is
+# allowed to stay in them - without this, a paper abstract that happens to
+# contain "research" or "challenges" gets bucketed as an actual opportunity.
+# Anything that fails its gate falls back to the generic Community bucket
+# rather than being dropped, since it may still be useful signal there.
+GATED_CATEGORIES = {
+    "Research": classify_research_subcategory,
+    "Competitions": classify_competition_subcategory,
+}
+
+
+def gate_category(category: str, title: str, summary: str) -> str:
+    gate_fn = GATED_CATEGORIES.get(category)
+    if gate_fn is None:
+        return category
+    return category if gate_fn(title, summary) else DEFAULT_CATEGORY
 
 
 # Startup tab sub-types, ordered so more specific programs win over the
@@ -119,16 +182,16 @@ DILUTION_NONDILUTIVE_KEYWORDS = [
 def classify_startup_subcategory(title: str, summary: str) -> Optional[str]:
     text = f"{title} {summary or ''}".lower()
     for subcategory, keywords in STARTUP_SUBCATEGORY_KEYWORDS:
-        if any(kw in text for kw in keywords):
+        if _any_keyword(text, keywords):
             return subcategory
     return None
 
 
 def classify_dilution_type(title: str, summary: str) -> str:
     text = f"{title} {summary or ''}".lower()
-    if any(kw in text for kw in DILUTION_NONDILUTIVE_KEYWORDS):
+    if _any_keyword(text, DILUTION_NONDILUTIVE_KEYWORDS):
         return "non-dilutive"
-    if any(kw in text for kw in DILUTION_EQUITY_KEYWORDS):
+    if _any_keyword(text, DILUTION_EQUITY_KEYWORDS):
         return "equity"
     return "unknown"
 
@@ -141,7 +204,7 @@ FUNDED_KEYWORDS = [
 
 def is_funded(title: str, summary: str) -> bool:
     text = f"{title} {summary or ''}".lower()
-    return any(kw in text for kw in FUNDED_KEYWORDS)
+    return _any_keyword(text, FUNDED_KEYWORDS)
 
 
 def score(published_recency_days: float) -> float:

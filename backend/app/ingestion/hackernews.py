@@ -7,7 +7,7 @@ from datetime import datetime
 import httpx
 from sqlalchemy.orm import Session
 
-from ..classify import classify, score
+from ..classify import classify, classify_competition_subcategory, gate_category, score
 from ..models import Opportunity, Source
 from .sources import HN_KEYWORDS
 from .utils import safe_add
@@ -56,12 +56,14 @@ def run(db: Session) -> dict:
                 except ValueError:
                     published_at = now
                 recency_days = max((now - published_at).total_seconds() / 86400, 0)
+                category = gate_category(classify(title, ""), title, "")
 
                 added = safe_add(db, Opportunity(
                     title=title,
                     summary=f"Discussed on Hacker News — {hit.get('points', 0)} points, {hit.get('num_comments', 0)} comments.",
                     url=url,
-                    category=classify(title, ""),
+                    category=category,
+                    subcategory=classify_competition_subcategory(title, "") if category == "Competitions" else None,
                     organization="Hacker News",
                     geography="Global",
                     published_at=published_at,

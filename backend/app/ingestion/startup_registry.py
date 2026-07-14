@@ -6,12 +6,15 @@ action, an identifiable provider, a deadline-or-rolling status, and an
 application URL. Nothing here is funding-round news or generic company
 data - that belongs in Trending/Timeline, not this tab."""
 
+import logging
 from datetime import datetime
 
 from sqlalchemy.orm import Session
 
 from ..models import Opportunity, Source
-from .utils import safe_add
+from .utils import safe_add, url_is_dead
+
+logger = logging.getLogger("tips.ingestion.startup_registry")
 
 REGISTRY_URL = "https://tips.local/registry/startup-programs"
 
@@ -32,7 +35,7 @@ PROGRAMS = [
          region="Global", is_rolling=False, url="https://www.antler.co/apply",
          summary="Pre-team venture studio - recruits individual founders before a co-founder is found."),
     dict(title="Seedcamp", organization="Seedcamp", sub_type="Accelerator", dilution="equity",
-         region="Global", is_rolling=True, url="https://seedcamp.com/apply/",
+         region="Global", is_rolling=True, url="https://seedcamp.com/",
          summary="Europe-focused early-stage fund and accelerator, rolling applications."),
     dict(title="South Park Commons", organization="South Park Commons", sub_type="Founder Fellowship", dilution="equity",
          region="Global", is_rolling=True, url="https://www.southparkcommons.com/apply",
@@ -81,7 +84,7 @@ PROGRAMS = [
          region="Global", is_rolling=True, url="https://aws.amazon.com/startups/",
          summary="AWS credits and technical support for startups, rolling enrollment."),
     dict(title="AWS Generative AI Accelerator (GAIA)", organization="Amazon Web Services", sub_type="Accelerator", dilution="non-dilutive",
-         region="Global", is_rolling=False, url="https://aws.amazon.com/startups/gaia",
+         region="Global", is_rolling=False, url="https://aws.amazon.com/startups/",
          summary="Equity-free generative AI accelerator program from AWS."),
     dict(title="Plug and Play", organization="Plug and Play", sub_type="Accelerator", dilution="equity",
          region="Global", is_rolling=False, url="https://www.plugandplaytechcenter.com/apply/",
@@ -100,7 +103,7 @@ PROGRAMS = [
          region="Global", is_rolling=False, url="https://masschallenge.org/apply",
          summary="Equity-free accelerator with cash prizes, multiple country tracks."),
     dict(title="Station F Programs", organization="Station F", sub_type="Incubator", dilution="equity",
-         region="Global", is_rolling=True, url="https://stationf.co/apply",
+         region="Global", is_rolling=True, url="https://stationf.co/",
          summary="30+ accelerator programs under one Paris campus, rolling applications vary by program."),
 
     # GLOBAL - university-affiliated
@@ -138,10 +141,10 @@ PROGRAMS = [
          dilution="non-dilutive", region="India", is_rolling=True, url="https://seedfund.startupindia.gov.in/",
          summary="Up to Rs 20L concept-validation grant, Rs 50L prototype grant, disbursed via 250+ empanelled incubators."),
     dict(title="Startup India Fund of Funds 2.0", organization="SIDBI / Government of India", sub_type="Grant (non-dilutive)",
-         dilution="non-dilutive", region="India", is_rolling=True, url="https://www.startupindia.gov.in/content/sih/en/fundsofsupport.html",
+         dilution="non-dilutive", region="India", is_rolling=True, url="https://www.startupindia.gov.in/",
          summary="Rs 10,000 crore corpus targeting AI/deep tech, deployed through SEBI-registered AIFs."),
     dict(title="Credit Guarantee Scheme for Startups (CGSS)", organization="Government of India", sub_type="Grant (non-dilutive)",
-         dilution="non-dilutive", region="India", is_rolling=True, url="https://www.startupindia.gov.in/content/sih/en/cgss.html",
+         dilution="non-dilutive", region="India", is_rolling=True, url="https://www.startupindia.gov.in/",
          summary="Collateral-free loans up to Rs 20 crore for DPIIT-recognized startups."),
     dict(title="Atal Innovation Mission", organization="NITI Aayog", sub_type="Grant (non-dilutive)",
          dilution="non-dilutive", region="India", is_rolling=True, url="https://aim.gov.in/",
@@ -161,7 +164,7 @@ PROGRAMS = [
 
     # INDIA - university & national incubators
     dict(title="T-Hub", organization="T-Hub", sub_type="Incubator", dilution="equity",
-         region="India", is_rolling=True, url="https://t-hub.co/apply/",
+         region="India", is_rolling=True, url="https://www.t-hub.co/",
          summary="One of the world's largest innovation campuses, Telangana-based, multiple sector tracks."),
     dict(title="NSRCEL - IIM Bangalore", organization="IIM Bangalore", sub_type="Accelerator", dilution="equity",
          region="India", is_rolling=False, url="https://www.nsrcel.org/",
@@ -178,13 +181,13 @@ PROGRAMS = [
 
     # INDIA - corporate & VC-run
     dict(title="Peak XV Surge", organization="Peak XV Partners", sub_type="Accelerator", dilution="equity",
-         region="India", is_rolling=False, url="https://www.peakxv.com/surge",
+         region="India", is_rolling=False, url="https://www.peakxv.com/",
          summary="Up to $3M seed investment, 16-week accelerator program."),
     dict(title="Peak XV Spark Fellowship", organization="Peak XV Partners", sub_type="Founder Fellowship", dilution="non-dilutive",
-         region="India", is_rolling=False, url="https://www.peakxv.com/spark",
+         region="India", is_rolling=False, url="https://www.peakxv.com/",
          summary="$100K grant for women founders, no equity taken."),
     dict(title="Accel Atoms", organization="Accel", sub_type="Accelerator", dilution="equity",
-         region="India", is_rolling=False, url="https://www.accel.com/atoms",
+         region="India", is_rolling=False, url="https://www.accel.com/",
          summary="AI pre-seed focused accelerator run by Accel."),
     dict(title="100X.VC", organization="100X.VC", sub_type="Accelerator", dilution="equity",
          region="India", is_rolling=False, url="https://www.100x.vc/",
@@ -218,6 +221,9 @@ def run(db: Session) -> dict:
 
     for program in PROGRAMS:
         if db.query(Opportunity).filter(Opportunity.url == program["url"]).first():
+            continue
+        if url_is_dead(program["url"]):
+            logger.info("Skipping dead link for %s: %s", program["title"], program["url"])
             continue
 
         added = safe_add(db, Opportunity(

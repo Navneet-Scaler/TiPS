@@ -8,7 +8,14 @@ from datetime import datetime, timezone
 import httpx
 from sqlalchemy.orm import Session
 
-from ..classify import classify, classify_research_subcategory, is_funded, score
+from ..classify import (
+    classify,
+    classify_competition_subcategory,
+    classify_research_subcategory,
+    gate_category,
+    is_funded,
+    score,
+)
 from ..models import Opportunity, Source
 from .sources import REDDIT_SUBREDDITS
 from .utils import safe_add
@@ -63,14 +70,20 @@ def run(db: Session) -> dict:
                 summary = (p.get("selftext") or "")[:800]
                 created = datetime.fromtimestamp(p.get("created_utc", now.timestamp()), tz=timezone.utc).replace(tzinfo=None)
                 recency_days = max((now - created).total_seconds() / 86400, 0)
-                category = classify(title, summary)
+                category = gate_category(classify(title, summary), title, summary)
+
+                subcategory = None
+                if category == "Research":
+                    subcategory = classify_research_subcategory(title, summary)
+                elif category == "Competitions":
+                    subcategory = classify_competition_subcategory(title, summary)
 
                 added = safe_add(db, Opportunity(
                     title=title,
                     summary=summary or None,
                     url=url,
                     category=category,
-                    subcategory=classify_research_subcategory(title, summary) if category == "Research" else None,
+                    subcategory=subcategory,
                     organization=f"r/{subreddit}",
                     geography="Global",
                     is_paid=is_funded(title, summary),

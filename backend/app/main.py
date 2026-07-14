@@ -1,4 +1,5 @@
 import logging
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,9 +16,14 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="TIPS - Talent Intelligence & Personal Signals API")
 
+allowed_origins = ["http://localhost:3000"]
+extra_origins = os.environ.get("ALLOWED_ORIGINS", "")
+if extra_origins:
+    allowed_origins.extend(o.strip() for o in extra_origins.split(",") if o.strip())
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

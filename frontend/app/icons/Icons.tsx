@@ -231,3 +231,12 @@ export function ArrowUpRightIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function RefreshIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 12a8 8 0 0 1 13.66-5.66M20 12a8 8 0 0 1-13.66 5.66" />
+      <path d="M17.5 4.5v3.5H14M6.5 19.5V16H10" />
+    </svg>
+  );
+}

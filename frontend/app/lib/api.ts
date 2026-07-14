@@ -33,6 +33,18 @@ async function apiGet<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+// A full ingestion run takes 60-100+ seconds (dozens of sources, plus
+// dead-link checks on the curated registries). Vercel's serverless function
+// proxy for /api/* rewrites has a much shorter execution limit, so this one
+// long-running call goes straight to the backend's public URL instead of
+// through that proxy - everything else stays on the fast relative-path API.
+const DIRECT_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+
+export async function triggerIngestRun(): Promise<void> {
+  const res = await fetch(`${DIRECT_BACKEND_URL}/api/ingest/run`, { method: "POST", cache: "no-store" });
+  if (!res.ok) throw new Error("Ingestion run failed");
+}
+
 export function fetchOpportunities(params: {
   category?: string;
   subcategory?: string;

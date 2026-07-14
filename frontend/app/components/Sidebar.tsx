@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { NAV_SECTIONS } from "@/lib/categories";
-import { GlobeIcon } from "@/icons/Icons";
+import { GlobeIcon, RefreshIcon } from "@/icons/Icons";
+import { triggerIngestRun } from "@/lib/api";
 
 function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -28,10 +29,25 @@ export default function Sidebar({
   onSelect: (key: string) => void;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshFailed, setRefreshFailed] = useState(false);
 
   const handleSelect = (key: string) => {
     onSelect(key);
     setMobileOpen(false);
+  };
+
+  const handleRefresh = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    setRefreshFailed(false);
+    try {
+      await triggerIngestRun();
+      window.location.reload();
+    } catch {
+      setRefreshing(false);
+      setRefreshFailed(true);
+    }
   };
 
   return (
@@ -115,8 +131,25 @@ export default function Sidebar({
           ))}
         </nav>
 
-        <div className="px-5 py-4 border-t border-base-border text-[11px] text-base-muted">
-          Live radar &middot; updates every 30 min
+        <div className="px-5 py-4 border-t border-base-border flex items-center justify-between gap-2">
+          <span className="text-[11px] text-base-muted">
+            {refreshing
+              ? "Refreshing now..."
+              : refreshFailed
+              ? "Refresh failed - try again"
+              : "Live radar · updates every 30 min"}
+          </span>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            title="Pull the latest data right now"
+            aria-label="Refresh all tabs now"
+            className={`w-7 h-7 shrink-0 flex items-center justify-center rounded-md border border-base-border text-base-muted hover:text-base-text hover:border-accent/50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+              refreshing ? "text-accent" : ""
+            }`}
+          >
+            <RefreshIcon width={14} height={14} className={refreshing ? "animate-spin" : ""} />
+          </button>
         </div>
       </aside>
     </>

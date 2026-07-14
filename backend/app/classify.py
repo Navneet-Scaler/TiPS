@@ -119,16 +119,31 @@ def classify_competition_subcategory(title: str, summary: str) -> Optional[str]:
     return None
 
 
-# Coarse AI/ML sub-field tagging - checked in order, first match wins.
+# AI/ML sub-field tagging - checked in order, first match wins, so more
+# specific sub-fields are listed before the broader parent field they'd
+# otherwise be absorbed into (e.g. "Autonomous Driving" before "Robotics").
 # This is a "nice to have" tag on top of category/subcategory, not a gate.
 AI_DOMAIN_KEYWORDS = [
     ("Agents", ["agent", "agentic", "autonomous agent", "multi-agent", "tool use", "mcp"]),
-    ("NLP", ["nlp", "language model", "llm", "text generation", "translation", "chatbot"]),
-    ("Computer Vision", ["computer vision", "image recognition", "object detection", "segmentation", "vision"]),
+    ("Autonomous Driving", ["autonomous driving", "self-driving", "driverless", "adas"]),
+    ("Object Detection & Segmentation", ["object detection", "segmentation", "instance segmentation", "semantic segmentation"]),
+    ("3D / Point Cloud", ["point cloud", "3d reconstruction", "lidar", "depth estimation"]),
+    ("Computer Vision", ["computer vision", "image recognition", "image classification", "vision"]),
     ("Speech", ["speech recognition", "asr", "text-to-speech", "voice ai", "audio"]),
-    ("Robotics", ["robotics", "robot", "manipulation", "autonomous driving", "self-driving"]),
-    ("Reinforcement Learning", ["reinforcement learning", "rl agent", "policy learning"]),
-    ("Multimodal / Generative", ["generative ai", "diffusion", "text-to-image", "multimodal", "genai"]),
+    ("Machine Translation", ["machine translation", "translation task"]),
+    ("Question Answering", ["question answering", "qa benchmark", "reading comprehension"]),
+    ("NLP", ["nlp", "language model", "llm", "text generation", "chatbot", "named entity"]),
+    ("Robotics", ["robotics", "robot", "manipulation", "humanoid"]),
+    ("Reinforcement Learning", ["reinforcement learning", "rl agent", "policy learning", "game playing"]),
+    ("Multimodal / Generative", ["generative ai", "diffusion", "text-to-image", "multimodal", "genai", "image generation"]),
+    ("Healthcare / Medical AI", ["medical imaging", "clinical", "healthcare ai", "biomedical", "genomics", "protein"]),
+    ("Drug Discovery", ["drug discovery", "molecular", "therapeutics", "molecule"]),
+    ("Climate / Earth Observation", ["climate", "earth observation", "satellite imagery", "remote sensing", "weather forecasting", "flood"]),
+    ("Finance / Quant", ["quant", "trading", "algorithmic trading", "financial modeling"]),
+    ("Recommender Systems", ["recommender system", "recommendation engine", "collaborative filtering"]),
+    ("Graph ML", ["graph neural network", "graph ml", "knowledge graph"]),
+    ("Time Series", ["time series", "forecasting model", "anomaly detection"]),
+    ("Federated Learning", ["federated learning", "on-device learning"]),
     ("Data Science", ["data science", "kaggle", "datathon", "predictive modeling"]),
     ("AI Safety", ["ai safety", "alignment", "interpretability", "red team"]),
 ]

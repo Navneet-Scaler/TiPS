@@ -60,7 +60,10 @@ REDDIT_SUBREDDITS = [
 
 HN_KEYWORDS = ["AI hackathon", "AI fellowship", "AI residency", "AI research grant"]
 
-GITHUB_TOPICS = ["ai-agents", "llm", "machine-learning", "generative-ai"]
+GITHUB_TOPICS = [
+    "ai-agents", "llm", "machine-learning", "generative-ai",
+    "computer-vision", "reinforcement-learning", "nlp", "robotics", "speech-recognition",
+]
 
 # Search terms run against Devpost's and Unstop's public search APIs each
 # cycle - both return live, open, deadline-bearing hackathons directly, no

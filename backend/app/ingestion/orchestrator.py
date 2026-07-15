@@ -20,6 +20,9 @@ from . import (
     huggingface_spaces,
     numerai,
     sitemap_watcher,
+    recognition_registry,
+    resources_registry,
+    beta_registry,
 )
 
 logger = logging.getLogger("tips.ingestion.orchestrator")
@@ -39,6 +42,9 @@ CONNECTORS = {
     "research_registry": research_registry.run,
     "startup_registry": startup_registry.run,
     "competitions_registry": competitions_registry.run,
+    "recognition_registry": recognition_registry.run,
+    "resources_registry": resources_registry.run,
+    "beta_registry": beta_registry.run,
 }
 
 

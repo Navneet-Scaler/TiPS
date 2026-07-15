@@ -1,7 +1,9 @@
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
 import feedparser
+import httpx
 from sqlalchemy.orm import Session
 
 from ..classify import (
@@ -35,8 +37,23 @@ def _parse_time(struct_time):
     return datetime(*struct_time[:6], tzinfo=timezone.utc).replace(tzinfo=None)
 
 
-def fetch_source(db: Session, source: Source, organization: str) -> int:
-    parsed = feedparser.parse(source.url)
+def _download_feed(url: str):
+    """Standalone, thread-safe fetch - downloading is the slow network part,
+    kept separate from feedparser.parse() (pure CPU) so every feed's request
+    can happen concurrently instead of one at a time."""
+    try:
+        resp = httpx.get(url, timeout=15, follow_redirects=True, headers={"User-Agent": "tips-opportunity-radar/0.1"})
+        resp.raise_for_status()
+        return resp.content
+    except Exception as exc:
+        logger.warning("Failed to download feed %s: %s", url, exc)
+        return None
+
+
+def fetch_source(db: Session, source: Source, organization: str, raw_feed) -> int:
+    if raw_feed is None:
+        return 0
+    parsed = feedparser.parse(raw_feed)
     new_count = 0
     now = datetime.utcnow()
 
@@ -93,11 +110,22 @@ def run_ingestion(db: Session) -> dict:
     results = {}
     sources_by_url = {s["url"]: s for s in RSS_SOURCES}
 
-    for source in db.query(Source).filter(Source.type == "rss", Source.active == True).all():  # noqa: E712
+    sources = db.query(Source).filter(Source.type == "rss", Source.active == True).all()  # noqa: E712
+    urls = [s.url for s in sources]
+
+    # Downloading is the slow network part - do every feed concurrently
+    # instead of one at a time, then parse+store sequentially as before.
+    raw_feeds = {}
+    if urls:
+        with ThreadPoolExecutor(max_workers=12) as pool:
+            for url, content in zip(urls, pool.map(_download_feed, urls)):
+                raw_feeds[url] = content
+
+    for source in sources:
         meta = sources_by_url.get(source.url, {})
         organization = meta.get("organization", source.name)
         try:
-            count = fetch_source(db, source, organization)
+            count = fetch_source(db, source, organization, raw_feeds.get(source.url))
             results[source.name] = count
         except Exception as exc:  # keep ingestion resilient to a single bad feed
             logger.warning("Failed to fetch %s: %s", source.name, exc)

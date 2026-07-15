@@ -7,6 +7,7 @@ in sources.SITEMAP_WATCH_SOURCES - no per-site parsing logic required."""
 
 import logging
 import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from xml.etree import ElementTree as ET
 
@@ -82,9 +83,12 @@ def _collect_candidate_urls(client: httpx.Client, sitemap_url: str) -> list:
     return matches[:MAX_CANDIDATE_URLS]
 
 
-def _fetch_title(client: httpx.Client, url: str):
+def _fetch_title(url: str):
+    """Standalone (no shared client) so it's safe to call from a thread pool -
+    title fetches across every site are the slow part of this connector, and
+    running them one at a time made a full run take minutes."""
     try:
-        resp = client.get(url, timeout=10, headers=HEADERS)
+        resp = httpx.get(url, timeout=10, headers=HEADERS, follow_redirects=True)
         resp.raise_for_status()
         match = re.search(r"<title[^>]*>(.*?)</title>", resp.text, re.IGNORECASE | re.DOTALL)
         if match:
@@ -107,43 +111,59 @@ def ensure_source(db: Session, name: str, url: str) -> Source:
 def run(db: Session) -> dict:
     now = datetime.utcnow()
     results = {}
+    sources_by_cfg = {}
+    per_site_new_urls = {}
 
     with httpx.Client(follow_redirects=True, headers=HEADERS) as client:
         for cfg in SITEMAP_WATCH_SOURCES:
             source = ensure_source(db, cfg["name"], cfg["sitemap_url"])
-            new_count = 0
+            sources_by_cfg[cfg["name"]] = source
 
-            for url in _collect_candidate_urls(client, cfg["sitemap_url"]):
-                if db.query(Opportunity).filter(Opportunity.url == url).first():
-                    continue
+            candidates = _collect_candidate_urls(client, cfg["sitemap_url"])
+            new_urls = [u for u in candidates if not db.query(Opportunity).filter(Opportunity.url == u).first()]
+            per_site_new_urls[cfg["name"]] = new_urls
 
-                title = _fetch_title(client, url)
-                if not title:
-                    continue
+    # Title fetches are the slow, purely I/O-bound part - do them all
+    # concurrently across every site instead of one request at a time.
+    all_urls = [u for urls in per_site_new_urls.values() for u in urls]
+    titles_by_url = {}
+    if all_urls:
+        with ThreadPoolExecutor(max_workers=16) as pool:
+            for url, title in zip(all_urls, pool.map(_fetch_title, all_urls)):
+                titles_by_url[url] = title
 
-                category = gate_category(classify(title, ""), title, "")
-                if category != "Research":
-                    continue
+    for cfg in SITEMAP_WATCH_SOURCES:
+        source = sources_by_cfg[cfg["name"]]
+        new_count = 0
 
-                added = safe_add(db, Opportunity(
-                    title=title,
-                    summary=f"Found via {cfg['organization']}'s site.",
-                    url=url,
-                    category="Research",
-                    subcategory=classify_research_subcategory(title, ""),
-                    organization=cfg["organization"],
-                    geography="Global",
-                    published_at=now,
-                    discovered_at=now,
-                    updated_at=now,
-                    score=0.5,
-                    source_id=source.id,
-                ))
-                if added:
-                    new_count += 1
+        for url in per_site_new_urls[cfg["name"]]:
+            title = titles_by_url.get(url)
+            if not title:
+                continue
 
-            source.last_fetched_at = now
-            db.commit()
-            results[cfg["name"]] = new_count
+            category = gate_category(classify(title, ""), title, "")
+            if category != "Research":
+                continue
+
+            added = safe_add(db, Opportunity(
+                title=title,
+                summary=f"Found via {cfg['organization']}'s site.",
+                url=url,
+                category="Research",
+                subcategory=classify_research_subcategory(title, ""),
+                organization=cfg["organization"],
+                geography="Global",
+                published_at=now,
+                discovered_at=now,
+                updated_at=now,
+                score=0.5,
+                source_id=source.id,
+            ))
+            if added:
+                new_count += 1
+
+        source.last_fetched_at = now
+        db.commit()
+        results[cfg["name"]] = new_count
 
     return results

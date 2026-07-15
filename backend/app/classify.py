@@ -28,6 +28,8 @@ CATEGORY_KEYWORDS = {
     "Startup": ["accelerator", "incubator", "startup", "demo day", "pitch"],
     "Publishing": ["conference", "journal", "workshop track", "proceedings"],
     "Beta Programs": ["beta", "early access", "preview", "waitlist"],
+    "Recognition": ["fellows program", "hall of fame", "distinguished", "lifetime achievement", "best paper award", "test of time award"],
+    "Resources": ["dataset", "cheat sheet", "open notebook", "toolkit release", "free course materials", "reference guide"],
 }
 
 DEFAULT_CATEGORY = "Community"

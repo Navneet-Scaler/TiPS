@@ -11,6 +11,12 @@ RSS_SOURCES = [
     {"name": "Microsoft Research Blog", "url": "https://www.microsoft.com/en-us/research/feed/", "organization": "Microsoft Research"},
     {"name": "Meta AI Blog", "url": "https://ai.meta.com/blog/rss/", "organization": "Meta AI"},
     {"name": "Berkeley AI Research", "url": "https://bair.berkeley.edu/blog/feed.xml", "organization": "Berkeley BAIR"},
+    {"name": "Cohere Blog", "url": "https://cohere.com/blog/rss.xml", "organization": "Cohere"},
+    {"name": "EleutherAI Blog", "url": "https://blog.eleuther.ai/index.xml", "organization": "EleutherAI"},
+    {"name": "Vector Institute Blog", "url": "https://vectorinstitute.ai/feed/", "organization": "Vector Institute"},
+    {"name": "Stanford CRFM", "url": "https://crfm.stanford.edu/feed.xml", "organization": "Stanford CRFM"},
+    {"name": "AI2 Blog", "url": "https://allenai.org/rss.xml", "organization": "Allen Institute for AI"},
+    {"name": "TensorFlow Blog", "url": "https://blog.tensorflow.org/feeds/posts/default", "organization": "TensorFlow"},
 
     # NOTE: arXiv paper feeds were removed - a paper is not an opportunity
     # (no application action), and their abstracts were false-positive
@@ -75,6 +81,17 @@ DEVPOST_SEARCH_TERMS = [
 UNSTOP_SEARCH_TERMS = [
     "artificial intelligence", "machine learning", "AI hackathon", "data science",
     "robotics", "computer vision",
+]
+
+# University lab sitemaps - no RSS, but their sites are server-rendered
+# (mostly Drupal) with a standard sitemap.xml, which works just as well for
+# the generic sitemap-watcher connector. Add a row here for any future site
+# with a real sitemap - no per-site scraping code needed.
+SITEMAP_WATCH_SOURCES = [
+    {"name": "Cornell CS", "organization": "Cornell", "sitemap_url": "https://www.cs.cornell.edu/sitemap.xml"},
+    {"name": "Princeton AI", "organization": "Princeton", "sitemap_url": "https://ai.princeton.edu/sitemap.xml"},
+    {"name": "Toronto CS", "organization": "University of Toronto", "sitemap_url": "https://web.cs.toronto.edu/sitemap.xml"},
+    {"name": "Mila", "organization": "Mila Quebec", "sitemap_url": "https://mila.quebec/sitemap.xml"},
 ]
 
 # Greenhouse job-board tokens (the string in boards-api.greenhouse.io/v1/boards/<token>/jobs)

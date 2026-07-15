@@ -168,10 +168,28 @@ GATED_CATEGORIES = {
 }
 
 
+# A title can contain "fellowship" or "award" as a matter of announcing that
+# someone already won it - "X awarded a fellowship" isn't something you can
+# apply to. No keyword list can fully separate open-call from retrospective
+# language, but these phrases catch the most common past-tense announcement
+# pattern and keep it out of Research/Competitions.
+RETROSPECTIVE_ANNOUNCEMENT_KEYWORDS = [
+    "awarded", "wins", "won the", "named a", "named as", "receives the",
+    "recipient of", "has been selected as", "congratulations to",
+]
+
+
+def _is_retrospective_announcement(title: str, summary: str) -> bool:
+    text = f"{title} {summary or ''}".lower()
+    return _any_keyword(text, RETROSPECTIVE_ANNOUNCEMENT_KEYWORDS)
+
+
 def gate_category(category: str, title: str, summary: str) -> str:
     gate_fn = GATED_CATEGORIES.get(category)
     if gate_fn is None:
         return category
+    if _is_retrospective_announcement(title, summary):
+        return DEFAULT_CATEGORY
     return category if gate_fn(title, summary) else DEFAULT_CATEGORY
 
 

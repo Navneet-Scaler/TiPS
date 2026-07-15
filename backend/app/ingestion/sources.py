@@ -17,6 +17,8 @@ RSS_SOURCES = [
     {"name": "Stanford CRFM", "url": "https://crfm.stanford.edu/feed.xml", "organization": "Stanford CRFM"},
     {"name": "AI2 Blog", "url": "https://allenai.org/rss.xml", "organization": "Allen Institute for AI"},
     {"name": "TensorFlow Blog", "url": "https://blog.tensorflow.org/feeds/posts/default", "organization": "TensorFlow"},
+    {"name": "Google Research Blog", "url": "https://research.google/blog/rss/", "organization": "Google Research"},
+    {"name": "Apple ML Research", "url": "https://machinelearning.apple.com/rss.xml", "organization": "Apple"},
 
     # NOTE: arXiv paper feeds were removed - a paper is not an opportunity
     # (no application action), and their abstracts were false-positive
@@ -92,6 +94,14 @@ SITEMAP_WATCH_SOURCES = [
     {"name": "Princeton AI", "organization": "Princeton", "sitemap_url": "https://ai.princeton.edu/sitemap.xml"},
     {"name": "Toronto CS", "organization": "University of Toronto", "sitemap_url": "https://web.cs.toronto.edu/sitemap.xml"},
     {"name": "Mila", "organization": "Mila Quebec", "sitemap_url": "https://mila.quebec/sitemap.xml"},
+    {"name": "Anthropic", "organization": "Anthropic", "sitemap_url": "https://www.anthropic.com/sitemap.xml"},
+    {"name": "IBM Research", "organization": "IBM", "sitemap_url": "https://research.ibm.com/sitemap.xml"},
+    {"name": "Stanford SAIL", "organization": "Stanford", "sitemap_url": "https://ai.stanford.edu/sitemap.xml"},
+    {"name": "Berkeley Sky Computing", "organization": "UC Berkeley", "sitemap_url": "https://sky.cs.berkeley.edu/sitemap.xml"},
+    {"name": "Cambridge ML Group", "organization": "University of Cambridge", "sitemap_url": "https://mlg.eng.cam.ac.uk/sitemap.xml"},
+    {"name": "TUM", "organization": "Technical University of Munich", "sitemap_url": "https://www.tum.de/sitemap.xml"},
+    {"name": "Georgia Tech CS", "organization": "Georgia Tech", "sitemap_url": "https://www.cc.gatech.edu/sitemap.xml"},
+    {"name": "UIUC CS", "organization": "UIUC", "sitemap_url": "https://cs.illinois.edu/sitemap.xml"},
 ]
 
 # Greenhouse job-board tokens (the string in boards-api.greenhouse.io/v1/boards/<token>/jobs)

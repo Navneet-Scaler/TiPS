@@ -203,6 +203,44 @@ PROGRAMS = [
     dict(title="Linux Foundation AI & Data", organization="LF AI & Data Foundation", subcategory="Fellowship",
          url="https://lfaidata.foundation/", geography="Global", is_remote=True, is_paid=False,
          summary="Umbrella foundation for open-source AI/data projects, working group participation open."),
+    dict(title="JAX", organization="Google", subcategory="Fellowship",
+         url="https://github.com/jax-ml/jax", geography="Global", is_remote=True, is_paid=False,
+         summary="Google's open-source array computation library, active contributor and research community."),
+
+    # More frontier labs without RSS/sitemap access
+    dict(title="Mistral AI", organization="Mistral AI", subcategory="Fellowship",
+         url="https://mistral.ai/news", geography="Global", is_remote=True, is_paid=True,
+         summary="Open-weight LLM lab's news page - research collaborations and occasional open positions."),
+    dict(title="MBZUAI", organization="Mohamed bin Zayed University of AI", subcategory="PhD Fellowship",
+         url="https://mbzuai.ac.ae/", geography="United Arab Emirates", is_remote=False, is_paid=True,
+         summary="World's first graduate research university dedicated to AI - funded PhD and postdoc positions."),
+    dict(title="LAION", organization="LAION", subcategory="Fellowship",
+         url="https://laion.ai/", geography="Global", is_remote=True, is_paid=False,
+         summary="Open-source AI research nonprofit behind major open datasets, volunteer research community."),
+
+    # Fellowship provider landing pages
+    dict(title="Google Research Programs & Events", organization="Google Research", subcategory="Fellowship",
+         url="https://research.google/programs-and-events/", geography="Global", is_remote=True, is_paid=True,
+         summary="Google Research's index of student programs, fellowships, and research award opportunities."),
+    dict(title="OpenAI Residency", organization="OpenAI", subcategory="Fellowship",
+         url="https://openai.com/residency/", geography="United States", is_remote=False, is_paid=True,
+         summary="OpenAI's research residency program for engineers and researchers transitioning into AI research."),
+
+    # More funding agencies
+    dict(title="DST India Research Grants", organization="Department of Science & Technology, India", subcategory="Government Program",
+         url="https://dst.gov.in/", geography="India", is_remote=False, is_paid=True,
+         summary="India's core science ministry, funds AI/ML research grants and fellowship programs."),
+
+    # AI opportunity aggregators (secondary discovery, not original hosts)
+    dict(title="AI Opportunity Radar", organization="mapd.cc", subcategory="Fellowship",
+         url="https://mapd.cc/", geography="Global", is_remote=True, is_paid=False,
+         summary="Curated aggregator of AI research and career opportunities."),
+    dict(title="AI for Science Hub", organization="AI for Science Hub", subcategory="Fellowship",
+         url="https://aiforsciencehub.org/", geography="Global", is_remote=True, is_paid=False,
+         summary="Community hub tracking AI-for-science research opportunities and events."),
+    dict(title="LaCross AI Institute Research Resources", organization="UVA Darden LaCross AI Institute", subcategory="Fellowship",
+         url="https://www.darden.virginia.edu/lacross-ai-institute/research/resources", geography="United States", is_remote=True, is_paid=False,
+         summary="Curated directory of AI research programs, labs, and funding resources."),
 ]
 
 

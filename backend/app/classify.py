@@ -176,6 +176,10 @@ GATED_CATEGORIES = {
 RETROSPECTIVE_ANNOUNCEMENT_KEYWORDS = [
     "awarded", "wins", "won the", "named a", "named as", "receives the",
     "recipient of", "has been selected as", "congratulations to",
+    # Profile/interview features about a person who already holds the role -
+    # "Meet the Postdoc: Q&A with X" reads as an opportunity by keyword but
+    # is a feature story, not something you can apply to.
+    "meet the", "q&a with", "q & a with", "spotlight:", "profile:", "interview with",
 ]
 
 
